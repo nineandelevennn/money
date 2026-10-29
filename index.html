@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Money Tracker</title>
+  <style>
+    :root {
+      --bg: #f4f6fb;
+      --panel: #ffffff;
+      --text: #172033;
+      --muted: #6b7280;
+      --line: #e5e9f2;
+      --accent: #4458d8;
+      --accent-hover: #3447c4;
+      --soft: #eef1ff;
+      --green: #16794b;
+      --red: #bd3f45;
+      --shadow: 0 12px 34px rgba(24, 37, 75, .07);
+      --radius: 18px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: radial-gradient(circle at top left, #e9edff 0, transparent 36%), var(--bg);
+      color: var(--text);
+      font: 15px/1.5 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    .wrap { max-width: 1160px; margin: 0 auto; padding: 38px 22px 54px; }
+    header { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; margin-bottom: 26px; }
+    .eyebrow { color: var(--accent); text-transform: uppercase; letter-spacing: .13em; font-size: 11px; font-weight: 800; margin-bottom: 7px; }
+    h1 { font-size: clamp(28px, 4vw, 38px); line-height: 1.12; margin: 0 0 9px; letter-spacing: -.035em; }
+    .subtitle { color: var(--muted); margin: 0; max-width: 690px; }
+    .local-pill { display: inline-flex; gap: 8px; align-items: center; white-space: nowrap; padding: 9px 12px; border: 1px solid #dce2f0; border-radius: 999px; color: #4e5a70; background: rgba(255,255,255,.75); font-size: 12px; }
+    .dot { width: 7px; height: 7px; background: #30a46c; border-radius: 50%; display: inline-block; }
+    .layout { display: grid; grid-template-columns: minmax(285px, 350px) minmax(0, 1fr); gap: 22px; align-items: start; }
+    .panel { background: var(--panel); border: 1px solid rgba(219,225,239,.85); border-radius: var(--radius); box-shadow: var(--shadow); }
+    .form-panel { padding: 23px; position: sticky; top: 18px; }
+    .section-title { margin: 0 0 5px; font-size: 18px; letter-spacing: -.015em; }
+    .section-note { color: var(--muted); font-size: 13px; margin: 0 0 21px; }
+    .field { margin-bottom: 16px; }
+    label { display: block; font-size: 12px; font-weight: 750; color: #485269; margin: 0 0 7px; }
+    input, select, textarea {
+      display: block; width: 100%; min-width: 0; border: 1px solid #dce2ed; border-radius: 10px;
+      background: #fff; color: var(--text); font: inherit; padding: 11px 12px; outline: none; transition: border-color .15s, box-shadow .15s;
+    }
+    input:focus, select:focus, textarea:focus { border-color: #7d8af0; box-shadow: 0 0 0 3px rgba(68,88,216,.12); }
+    textarea { resize: vertical; min-height: 86px; }
+    .amount-row { display: grid; grid-template-columns: minmax(0, 1fr) 105px; gap: 9px; }
+    .amount { font-size: 19px; font-weight: 700; }
+    .helper { color: var(--muted); font-size: 11px; margin-top: 6px; }
+    .btn { appearance: none; border: 0; border-radius: 11px; padding: 11px 15px; font: inherit; font-size: 13px; font-weight: 750; cursor: pointer; transition: transform .12s, background .15s, border-color .15s; }
+    .btn:active { transform: translateY(1px); }
+    .btn-primary { background: var(--accent); color: #fff; width: 100%; margin-top: 3px; padding: 13px 16px; }
+    .btn-primary:hover { background: var(--accent-hover); }
+    .btn-secondary { background: #fff; color: #39445b; border: 1px solid #dce2ed; }
+    .btn-secondary:hover { background: #f8f9fd; border-color: #c4cce0; }
+    .btn-danger { color: var(--red); background: #fff5f5; border: 1px solid #f2dada; }
+    .message { font-size: 12px; margin: 11px 0 0; min-height: 18px; color: var(--green); }
+    .main-column { min-width: 0; }
+    .stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-bottom: 18px; }
+    .stat { background: rgba(255,255,255,.86); border: 1px solid #e0e5f0; border-radius: 14px; padding: 15px 16px; min-width: 0; }
+    .stat-label { color: var(--muted); font-size: 11px; font-weight: 750; letter-spacing: .025em; margin-bottom: 5px; }
+    .stat-value { font-size: 18px; font-weight: 800; letter-spacing: -.025em; overflow-wrap: anywhere; }
+    .stat-currency { color: var(--muted); font-size: 11px; margin-top: 4px; }
+    .table-panel { overflow: hidden; }
+    .table-head { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; padding: 20px 20px 15px; }
+    .table-head .section-note { margin: 4px 0 0; }
+    .actions { display: flex; flex-wrap: wrap; gap: 8px; }
+    .filters { display: grid; grid-template-columns: minmax(130px, .7fr) minmax(150px, 1fr); gap: 10px; padding: 0 20px 16px; }
+    .filters input, .filters select { padding: 9px 11px; font-size: 13px; }
+    .table-scroll { overflow-x: auto; border-top: 1px solid var(--line); }
+    table { border-collapse: collapse; width: 100%; min-width: 650px; font-size: 13px; }
+    th { text-align: left; color: #68738a; font-size: 10px; text-transform: uppercase; letter-spacing: .07em; padding: 12px 15px; background: #fafbfe; white-space: nowrap; }
+    td { padding: 13px 15px; border-top: 1px solid #edf0f6; vertical-align: top; }
+    tbody tr:hover { background: #fbfcff; }
+    .money { font-weight: 800; white-space: nowrap; }
+    .income { color: var(--green); }
+    .expense { color: var(--text); }
+    .category { display: inline-block; border-radius: 7px; padding: 4px 7px; font-size: 11px; font-weight: 750; white-space: nowrap; background: #f0f2f7; color: #515d74; }
+    .category-food { background: #fff1df; color: #98601c; }
+    .category-essential { background: #e7f6ee; color: #287a52; }
+    .category-non-essential { background: #e9efff; color: #455bb5; }
+    .category-waste { background: #fff0f0; color: #b24449; }
+    .category-income { background: #e1f7eb; color: #147648; }
+    .comment { max-width: 230px; white-space: pre-wrap; overflow-wrap: anywhere; color: #525d73; }
+    .delete { border: 0; background: transparent; color: #9199aa; cursor: pointer; padding: 4px 6px; border-radius: 6px; font-size: 17px; line-height: 1; }
+    .delete:hover { color: var(--red); background: #fff0f0; }
+    .empty { text-align: center; padding: 44px 20px; color: var(--muted); }
+    .empty-icon { font-size: 27px; margin-bottom: 8px; }
+    .table-foot { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; padding: 12px 20px; border-top: 1px solid var(--line); color: var(--muted); font-size: 11px; }
+    .note { margin-top: 16px; color: #737d91; font-size: 12px; line-height: 1.6; }
+    @media (max-width: 850px) {
+      .layout { grid-template-columns: 1fr; }
+      .form-panel { position: static; }
+      .stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      header { flex-direction: column; }
+    }
+    @media (max-width: 520px) {
+      .wrap { padding: 24px 12px 35px; }
+      .form-panel { padding: 18px; }
+      .stats { grid-template-columns: 1fr; gap: 8px; }
+      .stat { padding: 12px 14px; }
+      .stat-value { font-size: 16px; }
+      .table-head { align-items: flex-start; padding: 17px 15px 13px; }
+      .filters { padding: 0 15px 14px; grid-template-columns: 1fr; }
+      .actions { width: 100%; }
+      .actions .btn { flex: 1; }
+      .local-pill { white-space: normal; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div>
+        <div class="eyebrow">Personal finance · Offline-first</div>
+        <h1>Money Tracker</h1>
+        <p class="subtitle">Записывай расходы и доходы, следи за балансом и переноси историю в Google Sheets.</p>
+      </div>
+      <div class="local-pill"><span class="dot"></span> Записи сохраняются в этом браузере</div>
+    </header>
+
+    <div class="layout">
+      <section class="panel form-panel">
+        <h2 class="section-title">Новая запись</h2>
+        <p class="section-note">Укажи сумму и детали операции.</p>
+        <form id="entryForm">
+          <div class="field">
+            <label for="date">Дата</label>
+            <input id="date" name="date" type="date" required />
+          </div>
+          <div class="field">
+            <label for="amount">Сумма</label>
+            <div class="amount-row">
+              <input class="amount" id="amount" name="amount" type="number" min="0.01" step="0.01" placeholder="0.00" required inputmode="decimal" />
+              <select id="currency" name="currency" aria-label="Валюта">
+                <option value="KZT">KZT</option>
+                <option value="USD">USD</option>
+                <option value="EUR">EUR</option>
+                <option value="XCD">XCD</option>
+              </select>
+            </div>
+            <div class="helper">Введи положительное число. Доход отмечается категорией Income.</div>
+          </div>
+          <div class="field">
+            <label for="category">Категория</label>
+            <select id="category" name="category" required>
+              <option value="food">food</option>
+              <option value="essential">essential</option>
+              <option value="non-essential">non-essential</option>
+              <option value="waste">waste</option>
+              <option value="income">income</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="comment">Комментарий <span style="font-weight:400;color:#8a92a2">(необязательно)</span></label>
+            <textarea id="comment" name="comment" placeholder="Например: обед, такси, зарплата…" rows="3"></textarea>
+          </div>
+          <button class="btn btn-primary" type="submit">Submit · Сохранить запись</button>
+          <p class="message" id="formMessage" role="status" aria-live="polite"></p>
+        </form>
+      </section>
+
+      <div class="main-column">
+        <section class="stats" id="stats" aria-label="Сводка"></section>
+
+        <section class="panel table-panel">
+          <div class="table-head">
+            <div>
+              <h2 class="section-title">История операций</h2>
+              <p class="section-note" id="recordCount">Пока нет записей</p>
+            </div>
+            <div class="actions">
+              <button class="btn btn-secondary" id="copyBtn" type="button">Копировать для Sheets</button>
+              <button class="btn btn-secondary" id="csvBtn" type="button">Экспорт CSV</button>
+            </div>
+          </div>
+          <div class="filters">
+            <select id="periodFilter" aria-label="Период">
+              <option value="all">За всё время</option>
+              <option value="month">Этот месяц</option>
+              <option value="year">Этот год</option>
+            </select>
+            <input id="searchFilter" type="search" placeholder="Поиск по комментарию или категории" aria-label="Поиск" />
+          </div>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr><th>Дата</th><th>Сумма</th><th>Валюта</th><th>Категория</th><th>Комментарий</th><th aria-label="Действия"></th></tr>
+              </thead>
+              <tbody id="entriesBody"></tbody>
+            </table>
+            <div class="empty" id="emptyState">
+              <div class="empty-icon">◷</div>
+              <strong>Пока пусто</strong><br />Добавь первую операцию в форме слева.
+            </div>
+          </div>
+          <div class="table-foot">
+            <span>Новые записи отображаются сверху.</span>
+            <span>Копирование предназначено для вставки в Google Sheets.</span>
+          </div>
+        </section>
+        <p class="note">Важно: данные хранятся локально в этом браузере на этом устройстве — они не синхронизируются автоматически с другими устройствами. Регулярно копируй таблицу в Google Sheets или скачивай CSV, чтобы сохранить историю отдельно. Итоги рассчитываются отдельно для каждой валюты, без конвертации.</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (() => {
+      'use strict';
+      const STORAGE_KEY = 'moneyTracker.entries.v1';
+      const currencies = ['KZT', 'USD', 'EUR', 'XCD'];
+      const categoryLabels = {
+        'food': 'food',
+        'essential': 'essential',
+        'non-essential': 'non-essential',
+        'waste': 'waste',
+        'income': 'income'
+      };
+      const $ = (id) => document.getElementById(id);
+      const form = $('entryForm');
+      const todayLocal = () => {
+        const now = new Date();
+        return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+      };
+      $('date').value = todayLocal();
+
+      let entries = loadEntries();
+      let messageTimer = null;
+
+      function loadEntries() {
+        try {
+          const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+          if (!Array.isArray(saved)) return [];
+          return saved.filter((x) => x && typeof x.id === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(x.date)
+            && Number.isFinite(Number(x.amount)) && Number(x.amount) > 0
+            && currencies.includes(x.currency) && Object.hasOwn(categoryLabels, x.category))
+            .map((x) => ({ ...x, amount: Number(x.amount), comment: String(x.comment || '') }));
+        } catch (error) {
+          return [];
+        }
+      }
+
+      function persist() {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+          return true;
+        } catch (error) {
+          showMessage('Не удалось сохранить данные в браузере. Скопируй таблицу или экспортируй CSV.', true);
+          return false;
+        }
+      }
+
+      function showMessage(text, isError = false) {
+        const el = $('formMessage');
+        el.textContent = text;
+        el.style.color = isError ? 'var(--red)' : 'var(--green)';
+        if (messageTimer) clearTimeout(messageTimer);
+        messageTimer = setTimeout(() => { el.textContent = ''; }, 5000);
+      }
+
+      function formatAmount(amount) {
+        return new Intl.NumberFormat('ru-RU', { minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(amount);
+      }
+
+      function formatDate(date) {
+        const [year, month, day] = date.split('-');
+        return `${day}.${month}.${year}`;
+      }
+
+      function filteredEntries() {
+        const period = $('periodFilter').value;
+        const query = $('searchFilter').value.trim().toLocaleLowerCase('ru');
+        const now = new Date();
+        const thisMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+        const thisYear = String(now.getFullYear());
+        return [...entries]
+          .filter((entry) => {
+            if (period === 'month' && !entry.date.startsWith(thisMonth)) return false;
+            if (period === 'year' && !entry.date.startsWith(thisYear)) return false;
+            if (query && !`${entry.comment} ${entry.category} ${entry.currency} ${entry.date}`.toLocaleLowerCase('ru').includes(query)) return false;
+            return true;
+          })
+          .sort((a, b) => b.date.localeCompare(a.date) || b.createdAt - a.createdAt);
+      }
+
+      function renderStats(list) {
+        const totals = Object.fromEntries(currencies.map((currency) => [currency, { expense: 0, income: 0 }]));
+        list.forEach((entry) => {
+          if (entry.category === 'income') totals[entry.currency].income += entry.amount;
+          else totals[entry.currency].expense += entry.amount;
+        });
+        const nonZero = currencies.filter((currency) => totals[currency].income !== 0 || totals[currency].expense !== 0);
+        const shown = nonZero.length ? nonZero : ['KZT'];
+        $('stats').innerHTML = shown.map((currency) => {
+          const t = totals[currency];
+          const balance = t.income - t.expense;
+          return `<div class="stat">
+            <div class="stat-label">${currency} · БАЛАНС</div>
+            <div class="stat-value ${balance >= 0 ? 'income' : 'expense'}">${balance < 0 ? '−' : ''}${formatAmount(Math.abs(balance))} ${currency}</div>
+            <div class="stat-currency">Расходы: ${formatAmount(t.expense)} · Доходы: ${formatAmount(t.income)}</div>
+          </div>`;
+        }).join('');
+      }
+
+      function render() {
+        const list = filteredEntries();
+        renderStats(list);
+        $('recordCount').textContent = `${list.length} ${list.length === 1 ? 'запись' : list.length >= 2 && list.length <= 4 ? 'записи' : 'записей'} · всего сохранено: ${entries.length}`;
+        $('emptyState').style.display = list.length ? 'none' : 'block';
+        $('entriesBody').innerHTML = list.map((entry) => {
+          const isIncome = entry.category === 'income';
+          const safeComment = escapeHTML(entry.comment || '—');
+          return `<tr>
+            <td>${formatDate(entry.date)}</td>
+            <td class="money ${isIncome ? 'income' : 'expense'}">${isIncome ? '+' : '−'}${formatAmount(entry.amount)}</td>
+            <td>${entry.currency}</td>
+            <td><span class="category category-${entry.category}">${categoryLabels[entry.category]}</span></td>
+            <td><div class="comment">${safeComment}</div></td>
+            <td><button class="delete" type="button" data-delete="${entry.id}" aria-label="Удалить запись от ${formatDate(entry.date)}" title="Удалить запись">×</button></td>
+          </tr>`;
+        }).join('');
+      }
+
+      function escapeHTML(value) {
+        return String(value).replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
+      }
+
+      form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const amount = Number($('amount').value);
+        const date = $('date').value;
+        const currency = $('currency').value;
+        const category = $('category').value;
+        const comment = $('comment').value.trim();
+        if (!date || !Number.isFinite(amount) || amount <= 0 || !currencies.includes(currency) || !Object.hasOwn(categoryLabels, category)) {
+          showMessage('Проверь дату и сумму: сумма должна быть больше нуля.', true);
+          return;
+        }
+        const entry = { id: (crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`), date, amount, currency, category, comment, createdAt: Date.now() };
+        entries.push(entry);
+        if (!persist()) {
+          entries.pop();
+          return;
+        }
+        render();
+        $('amount').value = '';
+        $('comment').value = '';
+        $('date').value = todayLocal();
+        $('category').value = 'food';
+        $('amount').focus();
+        showMessage(category === 'income' ? 'Доход сохранён.' : 'Расход сохранён.');
+      });
+
+      $('entriesBody').addEventListener('click', (event) => {
+        const button = event.target.closest('[data-delete]');
+        if (!button) return;
+        const entry = entries.find((item) => item.id === button.dataset.delete);
+        if (!entry) return;
+        if (!confirm(`Удалить запись ${formatDate(entry.date)} · ${formatAmount(entry.amount)} ${entry.currency}?`)) return;
+        const previous = entries;
+        entries = entries.filter((item) => item.id !== entry.id);
+        if (!persist()) entries = previous;
+        render();
+      });
+
+      $('periodFilter').addEventListener('change', render);
+      $('searchFilter').addEventListener('input', render);
+
+      function csvCell(value) {
+        const text = String(value ?? '');
+        return `"${text.replace(/"/g, '""')}"`;
+      }
+      function exportRows() {
+        const header = ['Date', 'Amount', 'Currency', 'Category', 'Comment'];
+        const rows = filteredEntries().map((x) => [x.date, x.amount, x.currency, x.category, x.comment]);
+        return { header, rows };
+      }
+
+      $('copyBtn').addEventListener('click', async () => {
+        const { header, rows } = exportRows();
+        const text = [header, ...rows].map((row) => row.map((field) => String(field ?? '').replace(/[\t\r\n]+/g, ' ')).join('\t')).join('\n');
+        try {
+          if (navigator.clipboard && window.isSecureContext) {
+            await navigator.clipboard.writeText(text);
+          } else {
+            const area = document.createElement('textarea');
+            area.value = text;
+            area.style.position = 'fixed'; area.style.opacity = '0'; area.style.left = '-9999px';
+            document.body.appendChild(area); area.select();
+            const ok = document.execCommand('copy'); area.remove();
+            if (!ok) throw new Error('copy failed');
+          }
+          showMessage(`Скопировано ${rows.length} записей. Вставь их в Google Sheets (Ctrl+V / ⌘V).`);
+        } catch (error) {
+          showMessage('Браузер не разрешил копирование. Используй «Экспорт CSV».', true);
+        }
+      });
+
+      $('csvBtn').addEventListener('click', () => {
+        const { header, rows } = exportRows();
+        const csv = '\uFEFF' + [header, ...rows].map((row) => row.map(csvCell).join(',')).join('\r\n');
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `money-tracker-${todayLocal()}.csv`;
+        document.body.appendChild(link); link.click(); link.remove();
+        URL.revokeObjectURL(url);
+        showMessage(`CSV экспортирован: ${rows.length} записей.`);
+      });
+
+      render();
+    })();
+  </script>
+</body>
+</html>
