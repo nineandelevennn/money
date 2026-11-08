@@ -2,215 +2,459 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Money Tracker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
+  <title>Money Tracker · PORSCHE Edition</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #f4f6fb;
-      --panel: #ffffff;
-      --text: #172033;
-      --muted: #6b7280;
-      --line: #e5e9f2;
-      --accent: #4458d8;
-      --accent-hover: #3447c4;
-      --soft: #eef1ff;
-      --green: #16794b;
-      --red: #bd3f45;
-      --shadow: 0 12px 34px rgba(24, 37, 75, .07);
-      --radius: 18px;
+      --bg: #f1f4f9;
+      --card: #ffffff;
+      --text: #0f172a;
+      --muted: #64748b;
+      --accent: #4355db;
+      --green: #0d9458;
+      --red: #e11d48;
     }
-    * { box-sizing: border-box; }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
     body {
       margin: 0;
-      background: radial-gradient(circle at top left, #e9edff 0, transparent 36%), var(--bg);
+      background: radial-gradient(circle at 0% 0%, #e4e9ff 0%, transparent 45%), var(--bg);
       color: var(--text);
-      font: 15px/1.5 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 14px;
+      line-height: 1.4;
+      padding-bottom: env(safe-area-inset-bottom, 20px);
     }
-    .wrap { max-width: 1160px; margin: 0 auto; padding: 38px 22px 54px; }
-    header { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; margin-bottom: 26px; }
-    .eyebrow { color: var(--accent); text-transform: uppercase; letter-spacing: .13em; font-size: 11px; font-weight: 800; margin-bottom: 7px; }
-    h1 { font-size: clamp(28px, 4vw, 38px); line-height: 1.12; margin: 0 0 9px; letter-spacing: -.035em; }
-    .subtitle { color: var(--muted); margin: 0; max-width: 690px; }
-    .local-pill { display: inline-flex; gap: 8px; align-items: center; white-space: nowrap; padding: 9px 12px; border: 1px solid #dce2f0; border-radius: 999px; color: #4e5a70; background: rgba(255,255,255,.75); font-size: 12px; }
-    .dot { width: 7px; height: 7px; background: #30a46c; border-radius: 50%; display: inline-block; }
-    .layout { display: grid; grid-template-columns: minmax(285px, 350px) minmax(0, 1fr); gap: 22px; align-items: start; }
-    .panel { background: var(--panel); border: 1px solid rgba(219,225,239,.85); border-radius: var(--radius); box-shadow: var(--shadow); }
-    .form-panel { padding: 23px; position: sticky; top: 18px; }
-    .section-title { margin: 0 0 5px; font-size: 18px; letter-spacing: -.015em; }
-    .section-note { color: var(--muted); font-size: 13px; margin: 0 0 21px; }
-    .field { margin-bottom: 16px; }
-    label { display: block; font-size: 12px; font-weight: 750; color: #485269; margin: 0 0 7px; }
-    input, select, textarea {
-      display: block; width: 100%; min-width: 0; border: 1px solid #dce2ed; border-radius: 10px;
-      background: #fff; color: var(--text); font: inherit; padding: 11px 12px; outline: none; transition: border-color .15s, box-shadow .15s;
+
+    /* Настройка скроллбара для компактных блоков */
+    ::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
     }
-    input:focus, select:focus, textarea:focus { border-color: #7d8af0; box-shadow: 0 0 0 3px rgba(68,88,216,.12); }
-    textarea { resize: vertical; min-height: 86px; }
-    .amount-row { display: grid; grid-template-columns: minmax(0, 1fr) 105px; gap: 9px; }
-    .amount { font-size: 19px; font-weight: 700; }
-    .helper { color: var(--muted); font-size: 11px; margin-top: 6px; }
-    .btn { appearance: none; border: 0; border-radius: 11px; padding: 11px 15px; font: inherit; font-size: 13px; font-weight: 750; cursor: pointer; transition: transform .12s, background .15s, border-color .15s; }
-    .btn:active { transform: translateY(1px); }
-    .btn-primary { background: var(--accent); color: #fff; width: 100%; margin-top: 3px; padding: 13px 16px; }
-    .btn-primary:hover { background: var(--accent-hover); }
-    .btn-secondary { background: #fff; color: #39445b; border: 1px solid #dce2ed; }
-    .btn-secondary:hover { background: #f8f9fd; border-color: #c4cce0; }
-    .btn-danger { color: var(--red); background: #fff5f5; border: 1px solid #f2dada; }
-    .message { font-size: 12px; margin: 11px 0 0; min-height: 18px; color: var(--green); }
-    .main-column { min-width: 0; }
-    .stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-bottom: 18px; }
-    .stat { background: rgba(255,255,255,.86); border: 1px solid #e0e5f0; border-radius: 14px; padding: 15px 16px; min-width: 0; }
-    .stat-label { color: var(--muted); font-size: 11px; font-weight: 750; letter-spacing: .025em; margin-bottom: 5px; }
-    .stat-value { font-size: 18px; font-weight: 800; letter-spacing: -.025em; overflow-wrap: anywhere; }
-    .stat-currency { color: var(--muted); font-size: 11px; margin-top: 4px; }
-    .table-panel { overflow: hidden; }
-    .table-head { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; padding: 20px 20px 15px; }
-    .table-head .section-note { margin: 4px 0 0; }
-    .actions { display: flex; flex-wrap: wrap; gap: 8px; }
-    .filters { display: grid; grid-template-columns: minmax(130px, .7fr) minmax(150px, 1fr); gap: 10px; padding: 0 20px 16px; }
-    .filters input, .filters select { padding: 9px 11px; font-size: 13px; }
-    .table-scroll { overflow-x: auto; border-top: 1px solid var(--line); }
-    table { border-collapse: collapse; width: 100%; min-width: 650px; font-size: 13px; }
-    th { text-align: left; color: #68738a; font-size: 10px; text-transform: uppercase; letter-spacing: .07em; padding: 12px 15px; background: #fafbfe; white-space: nowrap; }
-    td { padding: 13px 15px; border-top: 1px solid #edf0f6; vertical-align: top; }
-    tbody tr:hover { background: #fbfcff; }
-    .money { font-weight: 800; white-space: nowrap; }
-    .income { color: var(--green); }
-    .expense { color: var(--text); }
-    .category { display: inline-block; border-radius: 7px; padding: 4px 7px; font-size: 11px; font-weight: 750; white-space: nowrap; background: #f0f2f7; color: #515d74; }
-    .category-food { background: #fff1df; color: #98601c; }
-    .category-essential { background: #e7f6ee; color: #287a52; }
-    .category-non-essential { background: #e9efff; color: #455bb5; }
-    .category-waste { background: #fff0f0; color: #b24449; }
-    .category-income { background: #e1f7eb; color: #147648; }
-    .comment { max-width: 230px; white-space: pre-wrap; overflow-wrap: anywhere; color: #525d73; }
-    .delete { border: 0; background: transparent; color: #9199aa; cursor: pointer; padding: 4px 6px; border-radius: 6px; font-size: 17px; line-height: 1; }
-    .delete:hover { color: var(--red); background: #fff0f0; }
-    .empty { text-align: center; padding: 44px 20px; color: var(--muted); }
-    .empty-icon { font-size: 27px; margin-bottom: 8px; }
-    .table-foot { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; padding: 12px 20px; border-top: 1px solid var(--line); color: var(--muted); font-size: 11px; }
-    .note { margin-top: 16px; color: #737d91; font-size: 12px; line-height: 1.6; }
-    @media (max-width: 850px) {
-      .layout { grid-template-columns: 1fr; }
-      .form-panel { position: static; }
-      .stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-      header { flex-direction: column; }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 999px;
     }
-    @media (max-width: 520px) {
-      .wrap { padding: 24px 12px 35px; }
-      .form-panel { padding: 18px; }
-      .stats { grid-template-columns: 1fr; gap: 8px; }
-      .stat { padding: 12px 14px; }
-      .stat-value { font-size: 16px; }
-      .table-head { align-items: flex-start; padding: 17px 15px 13px; }
-      .filters { padding: 0 15px 14px; grid-template-columns: 1fr; }
-      .actions { width: 100%; }
-      .actions .btn { flex: 1; }
-      .local-pill { white-space: normal; }
+
+    /* Стили кнопок выбора валюты */
+    .curr-btn {
+      transition: all 0.14s cubic-bezier(0.2, 0.8, 0.2, 1);
+      user-select: none;
+    }
+    .curr-btn:active {
+      transform: scale(0.96);
+    }
+    .curr-btn.active {
+      background: #1e293b;
+      color: #ffffff;
+      border-color: #1e293b;
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.18);
+    }
+
+    /* Стили кнопок категорий */
+    .cat-btn {
+      transition: all 0.14s cubic-bezier(0.2, 0.8, 0.2, 1);
+      user-select: none;
+    }
+    .cat-btn:active {
+      transform: scale(0.96);
+    }
+
+    /* Неактивное состояние категорий (легкий оттенок) */
+    .cat-btn[data-cat="food"] { background: #dcdcdc; color: #bdc0c0; border-color: #353e43; }
+    .cat-btn[data-cat="essential"] { background: #dcdcdc; color: #bdc0c0; border-color: #353e43; }
+    .cat-btn[data-cat="non-essential"] { background: #dcdcdc; color: #bdc0c0; border-color: #353e43; }
+    .cat-btn[data-cat="waste"] { background: #dcdcdc; color: #bdc0c0; border-color: #353e43; }
+    .cat-btn[data-cat="income"] { background: #dcdcdc; color: #bdc0c0; border-color: #353e43; }
+
+    /* Активное состояние категорий (насыщенный цвет) */
+    .cat-btn.active[data-cat="food"] {
+      background: #d97706; color: #fff; border-color: #b45309;
+      box-shadow: 0 4px 12px rgba(217, 119, 6, 0.28);
+    }
+    .cat-btn.active[data-cat="essential"] {
+      background: #059669; color: #fff; border-color: #047857;
+      box-shadow: 0 4px 12px rgba(5, 150, 105, 0.28);
+    }
+    .cat-btn.active[data-cat="non-essential"] {
+      background: #4f46e5; color: #fff; border-color: #4338ca;
+      box-shadow: 0 4px 12px rgba(79, 70, 229, 0.28);
+    }
+    .cat-btn.active[data-cat="waste"] {
+      background: #e11d48; color: #fff; border-color: #be123c;
+      box-shadow: 0 4px 12px rgba(225, 29, 72, 0.28);
+    }
+    .cat-btn.active[data-cat="income"] {
+      background: #16a34a; color: #fff; border-color: #15803d;
+      box-shadow: 0 4px 12px rgba(22, 163, 74, 0.32);
+    }
+
+    /* Бейджи в таблице/списке */
+    .badge-food { background: #fef3c7; color: #92400e; }
+    .badge-essential { background: #d1fae5; color: #065f46; }
+    .badge-non-essential { background: #e0e7ff; color: #3730a3; }
+    .badge-waste { background: #ffe4e6; color: #9f1239; }
+    .badge-income { background: #dcfce7; color: #166534; }
+
+    /* Кнопка PORSCHE */
+    .btn-porsche {
+      background: linear-gradient(135deg, #111827 0%, #27272a 55%, #3f3f46 100%);
+      color: #fde047;
+      border: 1px solid #3f3f46;
+      box-shadow: 0 4px 14px rgba(17, 24, 39, 0.2);
+      transition: all 0.15s ease;
+    }
+    .btn-porsche:hover {
+      background: linear-gradient(135deg, #090d16 0%, #18181b 60%, #27272a 100%);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(17, 24, 39, 0.28);
+    }
+    .btn-porsche:active {
+      transform: translateY(0) scale(0.98);
+    }
+
+    /* Кастомный тумблер */
+    .toggle-checkbox:checked {
+      right: 0;
+      border-color: #10b981;
+    }
+    .toggle-checkbox:checked + .toggle-label {
+      background-color: #10b981;
     }
   </style>
 </head>
-<body>
-  <div class="wrap">
-    <header>
-      <div>
-        <div class="eyebrow">Personal finance · Offline-first</div>
-        <h1>Money Tracker</h1>
-        <p class="subtitle">Записывай расходы и доходы, следи за балансом и переноси историю в Google Sheets.</p>
+<body class="min-h-screen antialiased selection:bg-indigo-100 selection:text-indigo-900">
+
+  <!-- Основной контейнер: на телефоне плотный и компактный, на ПК двухколоночный -->
+  <div class="max-w-5xl mx-auto px-2.5 sm:px-5 pt-2.5 sm:pt-6 pb-8">
+
+    <!-- Компактная шапка -->
+    <header class="flex items-center justify-between gap-2 mb-2.5 sm:mb-4">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-xl bg-indigo-600 flex items-center justify-center text-white font-extrabold text-sm shadow-sm">
+          $
+        </div>
+        <div>
+          <h1 class="text-base sm:text-xl font-extrabold tracking-tight text-slate-900 leading-none">Money Tracker</h1>
+          <p class="text-[11px] text-slate-500 mt-0.5">Быстрый учёт · XCD по умолчанию</p>
+        </div>
       </div>
-      <div class="local-pill"><span class="dot"></span> Записи сохраняются в этом браузере</div>
+
+      <!-- Переключатель валюты для сводки сверху -->
+      <div class="flex items-center gap-1 bg-white/90 border border-slate-200/90 rounded-xl p-1 shadow-xs" id="summaryCurrencyTabs" aria-label="Фильтр валюты баланса">
+        <!-- Заполняется скриптом (Все / XCD / USD...) -->
+      </div>
     </header>
 
-    <div class="layout">
-      <section class="panel form-panel">
-        <h2 class="section-title">Новая запись</h2>
-        <p class="section-note">Укажи сумму и детали операции.</p>
-        <form id="entryForm">
-          <div class="field">
-            <label for="date">Дата</label>
-            <input id="date" name="date" type="date" required />
-          </div>
-          <div class="field">
-            <label for="amount">Сумма</label>
-            <div class="amount-row">
-              <input class="amount" id="amount" name="amount" type="number" min="0.01" step="0.01" placeholder="0.00" required inputmode="decimal" />
-              <select id="currency" name="currency" aria-label="Валюта">
-                <option value="KZT">KZT</option>
-                <option value="USD">USD</option>
-                <option value="EUR">EUR</option>
-                <option value="XCD">XCD</option>
-              </select>
+    <!-- 5) СВОДКА БАЛАНСА ВВЕРХУ СТРАНИЦЫ: День / Неделя (с ПН) / Месяц (с 1-го) -->
+    <!-- Всегда в 3 колонки, чтобы на экране телефона сразу были видны все 3 периода -->
+    <section aria-label="Баланс за день, неделю и месяц" class="grid grid-cols-3 gap-1.5 sm:gap-3 mb-3 sm:mb-5">
+      <!-- Сегодня -->
+      <div class="bg-white border border-slate-200/80 rounded-2xl p-2.5 sm:p-3.5 shadow-xs flex flex-col justify-between min-w-0">
+        <div class="flex items-center justify-between gap-1 mb-1">
+          <span class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-slate-500 truncate">Сегодня</span>
+          <span class="text-[10px] text-slate-400 font-medium hidden sm:inline" id="labelTodayDate"></span>
+        </div>
+        <div id="statDay" class="space-y-1 min-w-0"></div>
+      </div>
+
+      <!-- Неделя (с понедельника) -->
+      <div class="bg-white border border-slate-200/80 rounded-2xl p-2.5 sm:p-3.5 shadow-xs flex flex-col justify-between min-w-0">
+        <div class="flex items-center justify-between gap-1 mb-1">
+          <span class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-slate-500 truncate">Неделя <span class="font-normal text-[9px] sm:text-[10px] text-slate-400">(с ПН)</span></span>
+          <span class="text-[10px] text-slate-400 font-medium hidden sm:inline" id="labelWeekDate"></span>
+        </div>
+        <div id="statWeek" class="space-y-1 min-w-0"></div>
+      </div>
+
+      <!-- Месяц (с 1-го числа) -->
+      <div class="bg-white border border-slate-200/80 rounded-2xl p-2.5 sm:p-3.5 shadow-xs flex flex-col justify-between min-w-0">
+        <div class="flex items-center justify-between gap-1 mb-1">
+          <span class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-slate-500 truncate">Месяц <span class="font-normal text-[9px] sm:text-[10px] text-slate-400">(с 1-го)</span></span>
+          <span class="text-[10px] text-slate-400 font-medium hidden sm:inline" id="labelMonthDate"></span>
+        </div>
+        <div id="statMonth" class="space-y-1 min-w-0"></div>
+      </div>
+    </section>
+
+    <!-- Основная сетка: Форма + История -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-3.5 sm:gap-5 items-start">
+
+      <!-- ЛЕВАЯ КОЛОНКА / ВЕРХНИЙ БЛОК НА ТЕЛЕФОНЕ: Компактная форма в 1 клик -->
+      <section class="lg:col-span-5 bg-white border border-slate-200/90 rounded-2xl p-3 sm:p-4 shadow-sm lg:sticky lg:top-4">
+        <form id="entryForm" class="space-y-2.5 sm:space-y-3" novalidate>
+
+          <!-- Строка 1: Сумма и Дата на одной линии для экономии места на экране телефона -->
+          <div class="grid grid-cols-12 gap-2">
+            <div class="col-span-7">
+              <label for="amount" class="block text-[11px] font-bold text-slate-600 mb-1">Сумма</label>
+              <input
+                id="amount"
+                name="amount"
+                type="number"
+                min="0.01"
+                step="0.01"
+                placeholder="0.00"
+                required
+                inputmode="decimal"
+                class="w-full h-11 px-3 rounded-xl border border-slate-300 bg-slate-50/50 text-lg font-extrabold text-slate-900 focus:bg-white focus:border-indigo-500 focus:ring-3 focus:ring-indigo-500/15 outline-none transition"
+              />
             </div>
-            <div class="helper">Введи положительное число. Доход отмечается категорией Income.</div>
+            <div class="col-span-5">
+              <label for="date" class="block text-[11px] font-bold text-slate-600 mb-1">Дата</label>
+              <input
+                id="date"
+                name="date"
+                type="date"
+                required
+                class="w-full h-11 px-2.5 rounded-xl border border-slate-300 bg-slate-50/50 text-xs sm:text-sm font-semibold text-slate-800 focus:bg-white focus:border-indigo-500 focus:ring-3 focus:ring-indigo-500/15 outline-none transition"
+              />
+            </div>
           </div>
-          <div class="field">
-            <label for="category">Категория</label>
-            <select id="category" name="category" required>
-              <option value="food">food</option>
-              <option value="essential">essential</option>
-              <option value="non-essential">non-essential</option>
-              <option value="waste">waste</option>
-              <option value="income">income</option>
-            </select>
+
+          <!-- Строка 2: Валюта кнопками в 1 клик (по умолчанию XCD) -->
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <label class="text-[11px] font-bold text-slate-600">Валюта <span class="text-slate-400 font-normal">(1 клик)</span></label>
+              <span id="activeCurrencyHint" class="text-[10px] font-semibold text-indigo-600">Выбрано: XCD</span>
+            </div>
+            <input type="hidden" id="currency" name="currency" value="XCD" />
+            <div class="grid grid-cols-4 gap-1.5" id="currencyButtons" role="radiogroup" aria-label="Выбор валюты">
+              <button type="button" data-curr="XCD" class="curr-btn active h-10 rounded-xl border border-slate-200 bg-slate-50 font-extrabold text-xs sm:text-sm flex items-center justify-center gap-1">
+                <span>XCD</span>
+              </button>
+              <button type="button" data-curr="USD" class="curr-btn h-10 rounded-xl border border-slate-200 bg-slate-50 font-extrabold text-xs sm:text-sm text-slate-700 flex items-center justify-center gap-1">
+                <span>USD</span>
+              </button>
+              <button type="button" data-curr="EUR" class="curr-btn h-10 rounded-xl border border-slate-200 bg-slate-50 font-extrabold text-xs sm:text-sm text-slate-700 flex items-center justify-center gap-1">
+                <span>EUR</span>
+              </button>
+              <button type="button" data-curr="KZT" class="curr-btn h-10 rounded-xl border border-slate-200 bg-slate-50 font-extrabold text-xs sm:text-sm text-slate-700 flex items-center justify-center gap-1">
+                <span>KZT</span>
+              </button>
+            </div>
           </div>
-          <div class="field">
-            <label for="comment">Комментарий <span style="font-weight:400;color:#8a92a2">(необязательно)</span></label>
-            <textarea id="comment" name="comment" placeholder="Например: обед, такси, зарплата…" rows="3"></textarea>
+
+          <!-- Строка 3: Категория кнопками в 1 клик -->
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <label class="text-[11px] font-bold text-slate-600">Категория <span class="text-slate-400 font-normal">(1 клик)</span></label>
+              <span id="activeCategoryHint" class="text-[10px] font-semibold text-amber-700">Расход · food</span>
+            </div>
+            <input type="hidden" id="category" name="category" value="food" />
+            <!-- Сетка категорий: 3 сверху, 2 снизу для крупных кнопок на телефоне -->
+            <div class="grid grid-cols-3 gap-1.5" id="categoryButtons" role="radiogroup" aria-label="Выбор категории">
+              <button type="button" data-cat="food" class="cat-btn active h-10 px-2 rounded-xl border font-bold text-xs flex items-center justify-center gap-1 truncate">
+                <span>🍔</span><span>food</span>
+              </button>
+              <button type="button" data-cat="essential" class="cat-btn h-10 px-2 rounded-xl border font-bold text-xs flex items-center justify-center gap-1 truncate">
+                <span>🏠</span><span>essential</span>
+              </button>
+              <button type="button" data-cat="non-essential" class="cat-btn h-10 px-1.5 rounded-xl border font-bold text-[11px] sm:text-xs flex items-center justify-center gap-1 truncate">
+                <span>✨</span><span class="truncate">non-ess.</span>
+              </button>
+              <button type="button" data-cat="waste" class="cat-btn h-10 px-2 rounded-xl border font-bold text-xs flex items-center justify-center gap-1 truncate">
+                <span>🔥</span><span>waste</span>
+              </button>
+              <button type="button" data-cat="income" class="cat-btn col-span-2 h-10 px-2 rounded-xl border font-extrabold text-xs flex items-center justify-center gap-1.5 truncate">
+                <span>💰</span><span>+ INCOME (Доход)</span>
+              </button>
+            </div>
           </div>
-          <button class="btn btn-primary" type="submit">Submit · Сохранить запись</button>
-          <p class="message" id="formMessage" role="status" aria-live="polite"></p>
+
+          <!-- Строка 4: Однострочный компактный комментарий + Кнопка сохранения -->
+          <div class="pt-0.5">
+            <label for="comment" class="block text-[11px] font-bold text-slate-600 mb-1">
+              Комментарий <span class="font-normal text-slate-400">(необязательно)</span>
+            </label>
+            <input
+              id="comment"
+              name="comment"
+              type="text"
+              placeholder="Обед, продукты, такси, зарплата…"
+              autocomplete="off"
+              class="w-full h-10 px-3 rounded-xl border border-slate-300 bg-slate-50/50 text-sm text-slate-800 focus:bg-white focus:border-indigo-500 focus:ring-3 focus:ring-indigo-500/15 outline-none transition"
+            />
+          </div>
+
+          <button
+            type="submit"
+            class="w-full h-11 rounded-xl bg-indigo-600 hover:bg-indigo-700 active:scale-[0.99] text-white font-extrabold text-sm shadow-sm shadow-indigo-500/20 transition flex items-center justify-center gap-2 cursor-pointer"
+          >
+            <span>Сохранить запись</span>
+            <span class="text-xs opacity-80 font-normal">↵</span>
+          </button>
+
+          <!-- Уведомление и кнопка отмены удаления / очистки -->
+          <div id="statusBanner" class="hidden rounded-xl px-3 py-2 text-xs font-semibold flex items-center justify-between gap-2 transition-all" role="status" aria-live="polite">
+            <span id="statusText"></span>
+            <button type="button" id="undoBtn" class="hidden shrink-0 underline font-extrabold hover:opacity-80 cursor-pointer">
+              Вернуть
+            </button>
+          </div>
         </form>
       </section>
 
-      <div class="main-column">
-        <section class="stats" id="stats" aria-label="Сводка"></section>
+      <!-- ПРАВАЯ КОЛОНКА / НИЖНИЙ БЛОК: Экспорт в PORSCHE + История -->
+      <section class="lg:col-span-7 bg-white border border-slate-200/90 rounded-2xl shadow-sm overflow-hidden">
 
-        <section class="panel table-panel">
-          <div class="table-head">
+        <!-- Панель экспорта и настроек PORSCHE -->
+        <div class="p-3 sm:p-4 bg-slate-50/70 border-b border-slate-200/80 space-y-2.5">
+          <div class="flex flex-wrap items-center justify-between gap-2">
             <div>
-              <h2 class="section-title">История операций</h2>
-              <p class="section-note" id="recordCount">Пока нет записей</p>
+              <h2 class="text-sm sm:text-base font-extrabold text-slate-900 leading-tight">История и Экспорт</h2>
+              <p class="text-[11px] text-slate-500" id="recordCount">Пока нет записей</p>
             </div>
-            <div class="actions">
-              <button class="btn btn-secondary" id="copyBtn" type="button">Копировать для Sheets</button>
-              <button class="btn btn-secondary" id="csvBtn" type="button">Экспорт CSV</button>
-            </div>
+
+            <!-- Переключатель авто-очистки при экспорте в PORSCHE -->
+            <label for="clearOnPorscheToggle" class="inline-flex items-center gap-2 cursor-pointer select-none bg-white border border-slate-200/90 rounded-xl px-2.5 py-1.5 shadow-2xs">
+              <input type="checkbox" id="clearOnPorscheToggle" class="sr-only peer" checked />
+              <div class="w-8 h-4.5 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-3.5 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-3.5 after:w-3.5 after:transition-all relative peer-checked:bg-emerald-600"></div>
+              <span class="text-[11px] font-bold text-slate-700 leading-tight">
+                Стирать после <span class="text-slate-900">PORSCHE</span>
+              </span>
+            </label>
           </div>
-          <div class="filters">
-            <select id="periodFilter" aria-label="Период">
+
+          <!-- 4) Кнопки экспорта: Copy to Sheets, Copy to CSV и главная кнопка Export to PORSCHE -->
+          <div class="grid grid-cols-2 sm:grid-cols-12 gap-2">
+            <button
+              type="button"
+              id="porscheBtn"
+              class="btn-porsche col-span-2 sm:col-span-6 h-10 px-3 rounded-xl font-extrabold text-xs sm:text-sm flex items-center justify-center gap-1.5 cursor-pointer"
+              title="Скопировать строки без шапки, открыть таблицу PORSCHE и очистить список (если включено)"
+            >
+              <span>🏎️</span>
+              <span>Export to PORSCHE</span>
+            </button>
+
+            <button
+              type="button"
+              id="copyBtn"
+              class="col-span-1 sm:col-span-3 h-10 px-2.5 rounded-xl bg-white hover:bg-slate-50 active:scale-[0.98] text-slate-700 border border-slate-200/90 font-bold text-xs flex items-center justify-center gap-1 transition cursor-pointer"
+            >
+              <span>📋</span>
+              <span>Copy to Sheets</span>
+            </button>
+
+            <button
+              type="button"
+              id="csvBtn"
+              class="col-span-1 sm:col-span-3 h-10 px-2.5 rounded-xl bg-white hover:bg-slate-50 active:scale-[0.98] text-slate-700 border border-slate-200/90 font-bold text-xs flex items-center justify-center gap-1 transition cursor-pointer"
+            >
+              <span>⬇️</span>
+              <span>Copy to CSV</span>
+            </button>
+          </div>
+
+          <!-- Опциональная настройка прямой авто-вставки в Google Таблицу -->
+          <details class="text-[11px] text-slate-500 bg-white/80 rounded-xl border border-slate-200/70 px-3 py-1.5">
+            <summary class="cursor-pointer font-semibold text-slate-600 hover:text-slate-900 select-none flex items-center justify-between">
+              <span>⚙️ Как работает «Export to PORSCHE» и авто-заполнение пустых строк</span>
+              <span class="text-[10px] text-indigo-600 font-bold">Настроить</span>
+            </summary>
+            <div class="mt-2 pt-2 border-t border-slate-100 space-y-2 text-slate-600 leading-relaxed">
+              <p>
+                <strong>По умолчанию:</strong> нажатие на <b>Export to PORSCHE</b> копирует все записи (без заголовков) в буфер обмена, стирает их из приложения и открывает твою таблицу PORSCHE. Тебе остаётся кликнуть в первую пустую ячейку и нажать <kbd class="px-1.5 py-0.5 bg-slate-100 border rounded text-[10px]">Ctrl+V</kbd> (или «Вставить» на телефоне).
+              </p>
+              <div>
+                <label for="webhookUrl" class="block font-bold text-slate-700 mb-1">
+                  Авто-вставка без Ctrl+V (URL Google Apps Script, необязательно):
+                </label>
+                <div class="flex gap-1.5">
+                  <input
+                    id="webhookUrl"
+                    type="url"
+                    placeholder="https://script.google.com/macros/s/.../exec"
+                    class="flex-1 h-8 px-2.5 rounded-lg border border-slate-300 text-xs bg-white"
+                  />
+                  <button type="button" id="saveWebhookBtn" class="px-2.5 h-8 rounded-lg bg-slate-800 text-white font-bold text-xs cursor-pointer">
+                    Сохранить
+                  </button>
+                </div>
+                <p class="text-[10px] text-slate-400 mt-1">
+                  Если вставить в таблицу в <i>Расширения → Apps Script</i> короткий скрипт <code>doPost(e)</code> и указать его ссылку здесь, строки будут сами дописываться вниз листа при нажатии на кнопку.
+                </p>
+              </div>
+            </div>
+          </details>
+        </div>
+
+        <!-- Фильтры истории -->
+        <div class="p-2.5 sm:px-4 sm:py-2.5 border-b border-slate-100 grid grid-cols-12 gap-2 bg-white">
+          <div class="col-span-5 sm:col-span-4">
+            <select
+              id="periodFilter"
+              aria-label="Период"
+              class="w-full h-9 px-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs font-semibold text-slate-700 outline-none focus:border-indigo-500"
+            >
               <option value="all">За всё время</option>
-              <option value="month">Этот месяц</option>
-              <option value="year">Этот год</option>
+              <option value="today">За сегодня</option>
+              <option value="week">За эту неделю</option>
+              <option value="month">За этот месяц</option>
             </select>
-            <input id="searchFilter" type="search" placeholder="Поиск по комментарию или категории" aria-label="Поиск" />
           </div>
-          <div class="table-scroll">
-            <table>
-              <thead>
-                <tr><th>Дата</th><th>Сумма</th><th>Валюта</th><th>Категория</th><th>Комментарий</th><th aria-label="Действия"></th></tr>
-              </thead>
-              <tbody id="entriesBody"></tbody>
-            </table>
-            <div class="empty" id="emptyState">
-              <div class="empty-icon">◷</div>
-              <strong>Пока пусто</strong><br />Добавь первую операцию в форме слева.
-            </div>
+          <div class="col-span-7 sm:col-span-8">
+            <input
+              id="searchFilter"
+              type="search"
+              placeholder="Поиск по комментарию, валюте..."
+              aria-label="Поиск"
+              class="w-full h-9 px-3 rounded-xl border border-slate-200 bg-slate-50 text-xs text-slate-800 outline-none focus:bg-white focus:border-indigo-500"
+            />
           </div>
-          <div class="table-foot">
-            <span>Новые записи отображаются сверху.</span>
-            <span>Копирование предназначено для вставки в Google Sheets.</span>
-          </div>
-        </section>
-        <p class="note">Важно: данные хранятся локально в этом браузере на этом устройстве — они не синхронизируются автоматически с другими устройствами. Регулярно копируй таблицу в Google Sheets или скачивай CSV, чтобы сохранить историю отдельно. Итоги рассчитываются отдельно для каждой валюты, без конвертации.</p>
-      </div>
+        </div>
+
+        <!-- Список операций (адаптивный: без горизонтального скролла на телефоне!) -->
+        <div class="divide-y divide-slate-100 max-h-[440px] overflow-y-auto" id="entriesList"></div>
+
+        <!-- Пустое состояние -->
+        <div id="emptyState" class="py-10 px-4 text-center text-slate-400">
+          <div class="text-2xl mb-1">⚡</div>
+          <div class="text-xs font-bold text-slate-600">Список операций пуст</div>
+          <div class="text-[11px] text-slate-400 mt-0.5">Выбери сумму, категорию в 1 клик и нажми «Сохранить»</div>
+        </div>
+
+        <!-- Подвал таблицы с кнопкой возврата бэкапа, если есть -->
+        <div class="px-3.5 py-2.5 bg-slate-50/80 border-t border-slate-100 flex items-center justify-between gap-2 text-[11px] text-slate-400">
+          <span>Хранится локально в браузере</span>
+          <button
+            type="button"
+            id="restoreLastBackupBtn"
+            class="hidden text-indigo-600 font-bold hover:underline cursor-pointer"
+          >
+            ↺ Восстановить последний экспорт
+          </button>
+        </div>
+      </section>
+
     </div>
   </div>
 
   <script>
     (() => {
       'use strict';
+
+      // Ключи хранилища (сохраняем полную совместимость с предыдущими записями)
       const STORAGE_KEY = 'moneyTracker.entries.v1';
-      const currencies = ['KZT', 'USD', 'EUR', 'XCD'];
+      const CLEAR_TOGGLE_KEY = 'moneyTracker.clearOnPorsche.v1';
+      const BACKUP_KEY = 'moneyTracker.lastBackup.v1';
+      const WEBHOOK_KEY = 'moneyTracker.porscheWebhook.v1';
+
+      // Ссылка на целевую Google Таблицу PORSCHE
+      const PORSCHE_SHEET_URL = 'https://docs.google.com/spreadsheets/d/14qUsHQTvt3a3UdyaFWL6lmcIpeTt27dECd0IgVpH2dI/edit?gid=583901007#gid=583901007';
+
+      // 2) Список валют: XCD теперь первая и выбирается по умолчанию
+      const currencies = ['XCD', 'USD', 'EUR', 'KZT'];
+
       const categoryLabels = {
         'food': 'food',
         'essential': 'essential',
@@ -218,26 +462,77 @@
         'waste': 'waste',
         'income': 'income'
       };
+
+      const categoryIcons = {
+        'food': '🍔',
+        'essential': '🏠',
+        'non-essential': '✨',
+        'waste': '🔥',
+        'income': '💰'
+      };
+
       const $ = (id) => document.getElementById(id);
       const form = $('entryForm');
-      const todayLocal = () => {
-        const now = new Date();
-        return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-      };
-      $('date').value = todayLocal();
 
+      // Форматирование текущей локальной даты в YYYY-MM-DD
+      function toLocalISO(dateObj) {
+        const y = dateObj.getFullYear();
+        const m = String(dateObj.getMonth() + 1).padStart(2, '0');
+        const d = String(dateObj.getDate()).padStart(2, '0');
+        return `${y}-${m}-${d}`;
+      }
+
+      const todayLocal = () => toLocalISO(new Date());
+
+      // Вычисление границ: Сегодня, Понедельник текущей недели, 1-е число текущего месяца
+      function getPeriodBoundaries() {
+        const now = new Date();
+        const todayStr = toLocalISO(now);
+
+        // Понедельник этой недели (в JS getDay(): 0 - ВС, 1 - ПН, ..., 6 - СБ)
+        const dayOfWeek = now.getDay();
+        const diffToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+        const monday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - diffToMonday);
+        const mondayStr = toLocalISO(monday);
+
+        // Первое число этого месяца
+        const firstDayMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+        const monthStartStr = toLocalISO(firstDayMonth);
+
+        return { todayStr, mondayStr, monthStartStr };
+      }
+
+      // Состояние приложения
       let entries = loadEntries();
-      let messageTimer = null;
+      let summaryCurrencyFilter = 'ALL'; // 'ALL' или конкретная валюта
+      let undoState = null;
+      let statusTimer = null;
+
+      // Инициализация даты и настроек
+      $('date').value = todayLocal();
+      initSettings();
 
       function loadEntries() {
         try {
           const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
           if (!Array.isArray(saved)) return [];
-          return saved.filter((x) => x && typeof x.id === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(x.date)
-            && Number.isFinite(Number(x.amount)) && Number(x.amount) > 0
-            && currencies.includes(x.currency) && Object.hasOwn(categoryLabels, x.category))
-            .map((x) => ({ ...x, amount: Number(x.amount), comment: String(x.comment || '') }));
-        } catch (error) {
+          return saved
+            .filter((x) =>
+              x &&
+              typeof x.id === 'string' &&
+              /^\d{4}-\d{2}-\d{2}$/.test(x.date) &&
+              Number.isFinite(Number(x.amount)) &&
+              Number(x.amount) > 0 &&
+              currencies.includes(x.currency) &&
+              Object.hasOwn(categoryLabels, x.category)
+            )
+            .map((x) => ({
+              ...x,
+              amount: Number(x.amount),
+              comment: String(x.comment || ''),
+              createdAt: Number(x.createdAt) || Date.now()
+            }));
+        } catch (err) {
           return [];
         }
       }
@@ -246,87 +541,315 @@
         try {
           localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
           return true;
-        } catch (error) {
-          showMessage('Не удалось сохранить данные в браузере. Скопируй таблицу или экспортируй CSV.', true);
+        } catch (err) {
+          showStatus('Не удалось сохранить в память браузера. Сделай экспорт.', 'error');
           return false;
         }
       }
 
-      function showMessage(text, isError = false) {
-        const el = $('formMessage');
-        el.textContent = text;
-        el.style.color = isError ? 'var(--red)' : 'var(--green)';
-        if (messageTimer) clearTimeout(messageTimer);
-        messageTimer = setTimeout(() => { el.textContent = ''; }, 5000);
+      function initSettings() {
+        // Загружаем настройку очистки после Export to PORSCHE (по умолчанию ВКЛ)
+        const savedClear = localStorage.getItem(CLEAR_TOGGLE_KEY);
+        $('clearOnPorscheToggle').checked = savedClear === null ? true : savedClear === 'true';
+
+        $('clearOnPorscheToggle').addEventListener('change', (e) => {
+          try {
+            localStorage.setItem(CLEAR_TOGGLE_KEY, String(e.target.checked));
+          } catch (_) {}
+        });
+
+        // Загружаем опциональный Webhook
+        const savedWebhook = localStorage.getItem(WEBHOOK_KEY) || '';
+        $('webhookUrl').value = savedWebhook;
+        $('saveWebhookBtn').addEventListener('click', () => {
+          const url = $('webhookUrl').value.trim();
+          try {
+            localStorage.setItem(WEBHOOK_KEY, url);
+            showStatus(url ? 'Ссылка авто-вставки сохранена!' : 'Ссылка авто-вставки очищена.');
+          } catch (_) {}
+        });
+
+        checkBackupAvailability();
       }
+
+      function checkBackupAvailability() {
+        try {
+          const raw = localStorage.getItem(BACKUP_KEY);
+          const backup = raw ? JSON.parse(raw) : [];
+          if (Array.isArray(backup) && backup.length > 0 && entries.length === 0) {
+            $('restoreLastBackupBtn').classList.remove('hidden');
+            $('restoreLastBackupBtn').textContent = `↺ Вернуть стертые (${backup.length})`;
+          } else {
+            $('restoreLastBackupBtn').classList.add('hidden');
+          }
+        } catch (_) {
+          $('restoreLastBackupBtn').classList.add('hidden');
+        }
+      }
+
+      // 2 & 3) Обработка выбора валюты в 1 клик (по умолчанию XCD)
+      function selectCurrency(curr) {
+        if (!currencies.includes(curr)) return;
+        $('currency').value = curr;
+        $('activeCurrencyHint').textContent = `Выбрано: ${curr}`;
+        document.querySelectorAll('#currencyButtons .curr-btn').forEach((btn) => {
+          btn.classList.toggle('active', btn.dataset.curr === curr);
+        });
+      }
+
+      $('currencyButtons').addEventListener('click', (e) => {
+        const btn = e.target.closest('[data-curr]');
+        if (!btn) return;
+        selectCurrency(btn.dataset.curr);
+      });
+
+      // 3) Обработка выбора категории в 1 клик
+      function selectCategory(cat) {
+        if (!Object.hasOwn(categoryLabels, cat)) return;
+        $('category').value = cat;
+        const isInc = cat === 'income';
+        $('activeCategoryHint').textContent = isInc ? 'Доход · income' : `Расход · ${cat}`;
+        $('activeCategoryHint').className = `text-[10px] font-semibold ${isInc ? 'text-emerald-700' : 'text-amber-700'}`;
+        document.querySelectorAll('#categoryButtons .cat-btn').forEach((btn) => {
+          btn.classList.toggle('active', btn.dataset.cat === cat);
+        });
+      }
+
+      $('categoryButtons').addEventListener('click', (e) => {
+        const btn = e.target.closest('[data-cat]');
+        if (!btn) return;
+        selectCategory(btn.dataset.cat);
+      });
+
+      // Уведомления с поддержкой кнопки "Вернуть" (Undo)
+      function showStatus(text, type = 'success', undoCallback = null) {
+        const banner = $('statusBanner');
+        const textEl = $('statusText');
+        const undoBtn = $('undoBtn');
+
+        banner.classList.remove('hidden', 'bg-emerald-50', 'text-emerald-800', 'border-emerald-200', 'bg-rose-50', 'text-rose-800', 'border-rose-200');
+        banner.classList.add('border');
+
+        if (type === 'error') {
+          banner.classList.add('bg-rose-50', 'text-rose-800', 'border-rose-200');
+        } else {
+          banner.classList.add('bg-emerald-50', 'text-emerald-800', 'border-emerald-200');
+        }
+
+        textEl.textContent = text;
+
+        if (typeof undoCallback === 'function') {
+          undoState = undoCallback;
+          undoBtn.classList.remove('hidden');
+        } else {
+          undoState = null;
+          undoBtn.classList.add('hidden');
+        }
+
+        if (statusTimer) clearTimeout(statusTimer);
+        statusTimer = setTimeout(() => {
+          banner.classList.add('hidden');
+        }, 7000);
+      }
+
+      $('undoBtn').addEventListener('click', () => {
+        if (typeof undoState === 'function') {
+          undoState();
+          undoState = null;
+          $('statusBanner').classList.add('hidden');
+        }
+      });
+
+      $('restoreLastBackupBtn').addEventListener('click', () => {
+        try {
+          const backup = JSON.parse(localStorage.getItem(BACKUP_KEY) || '[]');
+          if (Array.isArray(backup) && backup.length > 0) {
+            entries = backup;
+            persist();
+            render();
+            showStatus(`Восстановлено записей: ${backup.length}`);
+          }
+        } catch (_) {}
+      });
 
       function formatAmount(amount) {
-        return new Intl.NumberFormat('ru-RU', { minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(amount);
+        return new Intl.NumberFormat('ru-RU', {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 2
+        }).format(amount);
       }
 
-      function formatDate(date) {
-        const [year, month, day] = date.split('-');
-        return `${day}.${month}.${year}`;
+      function formatShortDate(dateStr) {
+        const [year, month, day] = dateStr.split('-');
+        return `${day}.${month}.${year.slice(2)}`;
       }
 
+      function escapeHTML(value) {
+        return String(value).replace(/[&<>"']/g, (c) => ({
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#39;'
+        }[c]));
+      }
+
+      // 5) Расчет и рендер баланса сверху за: Сегодня / Неделю (с ПН) / Месяц (с 1-го)
+      function renderTopBalances() {
+        const { todayStr, mondayStr, monthStartStr } = getPeriodBoundaries();
+
+        // Подписи дат для десктопа
+        $('labelTodayDate').textContent = formatShortDate(todayStr).slice(0, 5);
+        $('labelWeekDate').textContent = `с ${formatShortDate(mondayStr).slice(0, 5)}`;
+        $('labelMonthDate').textContent = `с ${formatShortDate(monthStartStr).slice(0, 5)}`;
+
+        // Определяем какие валюты есть в записях
+        const usedCurrencies = currencies.filter((c) => entries.some((e) => e.currency === c));
+        const activeTabs = ['ALL', ...(usedCurrencies.length ? usedCurrencies : ['XCD'])];
+        if (!activeTabs.includes(summaryCurrencyFilter)) {
+          summaryCurrencyFilter = 'ALL';
+        }
+
+        // Рендерим переключатель валют в шапке
+        $('summaryCurrencyTabs').innerHTML = activeTabs.map((tab) => {
+          const isActive = summaryCurrencyFilter === tab;
+          const label = tab === 'ALL' ? 'Все' : tab;
+          return `<button type="button" data-sum-curr="${tab}" class="px-2 py-1 rounded-lg text-[11px] font-extrabold transition cursor-pointer ${
+            isActive ? 'bg-slate-900 text-white shadow-2xs' : 'text-slate-500 hover:text-slate-800'
+          }">${label}</button>`;
+        }).join('');
+
+        // Фильтры записей по 3 периодам (включительно до сегодняшнего дня или всех записей периода)
+        const dayEntries = entries.filter((e) => e.date === todayStr);
+        const weekEntries = entries.filter((e) => e.date >= mondayStr && e.date <= todayStr);
+        const monthEntries = entries.filter((e) => e.date >= monthStartStr && e.date <= todayStr);
+
+        $('statDay').innerHTML = buildPeriodCardHTML(dayEntries);
+        $('statWeek').innerHTML = buildPeriodCardHTML(weekEntries);
+        $('statMonth').innerHTML = buildPeriodCardHTML(monthEntries);
+      }
+
+      function buildPeriodCardHTML(periodList) {
+        const targetCurrencies = summaryCurrencyFilter === 'ALL'
+          ? currencies.filter((c) => periodList.some((e) => e.currency === c))
+          : [summaryCurrencyFilter];
+
+        // Если за этот период ещё нет записей — показываем 0 XCD (или выбранную валюту)
+        const listToRender = targetCurrencies.length > 0
+          ? targetCurrencies
+          : [summaryCurrencyFilter === 'ALL' ? 'XCD' : summaryCurrencyFilter];
+
+        return listToRender.map((curr) => {
+          let income = 0;
+          let expense = 0;
+          periodList.forEach((e) => {
+            if (e.currency !== curr) return;
+            if (e.category === 'income') income += e.amount;
+            else expense += e.amount;
+          });
+          const balance = income - expense;
+          const sign = balance > 0 ? '+' : balance < 0 ? '−' : '';
+          const colorClass = balance > 0
+            ? 'text-emerald-600'
+            : balance < 0
+            ? 'text-slate-900'
+            : 'text-slate-400';
+
+          return `
+            <div class="pt-0.5 first:pt-0 border-t first:border-t-0 border-slate-100">
+              <div class="text-xs sm:text-base font-extrabold tracking-tight ${colorClass} truncate">
+                ${sign}${formatAmount(Math.abs(balance))} <span class="text-[10px] sm:text-xs font-bold text-slate-500">${curr}</span>
+              </div>
+              <div class="flex flex-wrap items-center gap-x-1.5 text-[9px] sm:text-[11px] text-slate-400 font-medium leading-tight">
+                <span class="text-emerald-600">+${formatAmount(income)}</span>
+                <span>·</span>
+                <span class="text-rose-600">−${formatAmount(expense)}</span>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      $('summaryCurrencyTabs').addEventListener('click', (e) => {
+        const btn = e.target.closest('[data-sum-curr]');
+        if (!btn) return;
+        summaryCurrencyFilter = btn.dataset.sumCurr;
+        renderTopBalances();
+      });
+
+      // Фильтрация списка истории
       function filteredEntries() {
         const period = $('periodFilter').value;
         const query = $('searchFilter').value.trim().toLocaleLowerCase('ru');
-        const now = new Date();
-        const thisMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-        const thisYear = String(now.getFullYear());
+        const { todayStr, mondayStr, monthStartStr } = getPeriodBoundaries();
+
         return [...entries]
           .filter((entry) => {
-            if (period === 'month' && !entry.date.startsWith(thisMonth)) return false;
-            if (period === 'year' && !entry.date.startsWith(thisYear)) return false;
-            if (query && !`${entry.comment} ${entry.category} ${entry.currency} ${entry.date}`.toLocaleLowerCase('ru').includes(query)) return false;
+            if (period === 'today' && entry.date !== todayStr) return false;
+            if (period === 'week' && (entry.date < mondayStr || entry.date > todayStr)) return false;
+            if (period === 'month' && (entry.date < monthStartStr || entry.date > todayStr)) return false;
+            if (query) {
+              const haystack = `${entry.comment} ${entry.category} ${entry.currency} ${entry.date}`.toLocaleLowerCase('ru');
+              if (!haystack.includes(query)) return false;
+            }
             return true;
           })
           .sort((a, b) => b.date.localeCompare(a.date) || b.createdAt - a.createdAt);
       }
 
-      function renderStats(list) {
-        const totals = Object.fromEntries(currencies.map((currency) => [currency, { expense: 0, income: 0 }]));
-        list.forEach((entry) => {
-          if (entry.category === 'income') totals[entry.currency].income += entry.amount;
-          else totals[entry.currency].expense += entry.amount;
-        });
-        const nonZero = currencies.filter((currency) => totals[currency].income !== 0 || totals[currency].expense !== 0);
-        const shown = nonZero.length ? nonZero : ['KZT'];
-        $('stats').innerHTML = shown.map((currency) => {
-          const t = totals[currency];
-          const balance = t.income - t.expense;
-          return `<div class="stat">
-            <div class="stat-label">${currency} · БАЛАНС</div>
-            <div class="stat-value ${balance >= 0 ? 'income' : 'expense'}">${balance < 0 ? '−' : ''}${formatAmount(Math.abs(balance))} ${currency}</div>
-            <div class="stat-currency">Расходы: ${formatAmount(t.expense)} · Доходы: ${formatAmount(t.income)}</div>
-          </div>`;
-        }).join('');
-      }
-
+      // Рендер всего интерфейса
       function render() {
+        renderTopBalances();
+        checkBackupAvailability();
+
         const list = filteredEntries();
-        renderStats(list);
-        $('recordCount').textContent = `${list.length} ${list.length === 1 ? 'запись' : list.length >= 2 && list.length <= 4 ? 'записи' : 'записей'} · всего сохранено: ${entries.length}`;
+        $('recordCount').textContent = `Показано: ${list.length} · Всего в памяти: ${entries.length}`;
         $('emptyState').style.display = list.length ? 'none' : 'block';
-        $('entriesBody').innerHTML = list.map((entry) => {
+
+        $('entriesList').innerHTML = list.map((entry) => {
           const isIncome = entry.category === 'income';
-          const safeComment = escapeHTML(entry.comment || '—');
-          return `<tr>
-            <td>${formatDate(entry.date)}</td>
-            <td class="money ${isIncome ? 'income' : 'expense'}">${isIncome ? '+' : '−'}${formatAmount(entry.amount)}</td>
-            <td>${entry.currency}</td>
-            <td><span class="category category-${entry.category}">${categoryLabels[entry.category]}</span></td>
-            <td><div class="comment">${safeComment}</div></td>
-            <td><button class="delete" type="button" data-delete="${entry.id}" aria-label="Удалить запись от ${formatDate(entry.date)}" title="Удалить запись">×</button></td>
-          </tr>`;
+          const safeComment = escapeHTML(entry.comment || '');
+          const icon = categoryIcons[entry.category] || '•';
+
+          return `
+            <div class="px-3 sm:px-4 py-2.5 flex items-center justify-between gap-2.5 hover:bg-slate-50/80 transition">
+              <div class="flex items-center gap-2.5 min-w-0 flex-1">
+                <div class="w-8 h-8 rounded-xl flex items-center justify-center text-sm shrink-0 badge-${entry.category}">
+                  ${icon}
+                </div>
+                <div class="min-w-0 flex-1">
+                  <div class="flex items-center gap-1.5 flex-wrap">
+                    <span class="text-[11px] font-bold px-1.5 py-0.5 rounded-md badge-${entry.category}">
+                      ${categoryLabels[entry.category]}
+                    </span>
+                    <span class="text-[11px] font-semibold text-slate-400">${formatShortDate(entry.date)}</span>
+                  </div>
+                  ${safeComment ? `<div class="text-xs text-slate-700 truncate mt-0.5">${safeComment}</div>` : ''}
+                </div>
+              </div>
+
+              <div class="flex items-center gap-2 shrink-0">
+                <div class="text-right">
+                  <div class="text-xs sm:text-sm font-extrabold ${isIncome ? 'text-emerald-600' : 'text-slate-900'}">
+                    ${isIncome ? '+' : '−'}${formatAmount(entry.amount)} <span class="text-[10px] font-bold text-slate-500">${entry.currency}</span>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  data-delete="${entry.id}"
+                  class="w-7 h-7 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 flex items-center justify-center text-base font-bold transition cursor-pointer"
+                  aria-label="Удалить запись"
+                  title="Удалить"
+                >
+                  ×
+                </button>
+              </div>
+            </div>
+          `;
         }).join('');
       }
 
-      function escapeHTML(value) {
-        return String(value).replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
-      }
-
+      // Добавление новой записи
       form.addEventListener('submit', (event) => {
         event.preventDefault();
         const amount = Number($('amount').value);
@@ -334,83 +857,219 @@
         const currency = $('currency').value;
         const category = $('category').value;
         const comment = $('comment').value.trim();
+
         if (!date || !Number.isFinite(amount) || amount <= 0 || !currencies.includes(currency) || !Object.hasOwn(categoryLabels, category)) {
-          showMessage('Проверь дату и сумму: сумма должна быть больше нуля.', true);
+          showStatus('Укажи сумму больше нуля.', 'error');
+          $('amount').focus();
           return;
         }
-        const entry = { id: (crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`), date, amount, currency, category, comment, createdAt: Date.now() };
+
+        const entry = {
+          id: (crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`),
+          date,
+          amount,
+          currency,
+          category,
+          comment,
+          createdAt: Date.now()
+        };
+
         entries.push(entry);
         if (!persist()) {
           entries.pop();
           return;
         }
+
         render();
+
+        // Сброс полей: валюта возвращается на XCD по требованию, категория на food
         $('amount').value = '';
         $('comment').value = '';
         $('date').value = todayLocal();
-        $('category').value = 'food';
+        selectCurrency('XCD');
+        selectCategory('food');
         $('amount').focus();
-        showMessage(category === 'income' ? 'Доход сохранён.' : 'Расход сохранён.');
+
+        showStatus(
+          category === 'income'
+            ? `+${formatAmount(amount)} ${currency} добавлено в доход`
+            : `−${formatAmount(amount)} ${currency} (${category}) сохранено`
+        );
       });
 
-      $('entriesBody').addEventListener('click', (event) => {
+      // Удаление записи без раздражающего confirm() — с мгновенной кнопкой "Вернуть"
+      $('entriesList').addEventListener('click', (event) => {
         const button = event.target.closest('[data-delete]');
         if (!button) return;
-        const entry = entries.find((item) => item.id === button.dataset.delete);
-        if (!entry) return;
-        if (!confirm(`Удалить запись ${formatDate(entry.date)} · ${formatAmount(entry.amount)} ${entry.currency}?`)) return;
-        const previous = entries;
-        entries = entries.filter((item) => item.id !== entry.id);
-        if (!persist()) entries = previous;
+        const id = button.dataset.delete;
+        const index = entries.findIndex((item) => item.id === id);
+        if (index === -1) return;
+
+        const removed = entries[index];
+        entries.splice(index, 1);
+        persist();
         render();
+
+        showStatus(
+          `Удалено: ${formatAmount(removed.amount)} ${removed.currency}`,
+          'success',
+          () => {
+            entries.push(removed);
+            persist();
+            render();
+          }
+        );
       });
 
       $('periodFilter').addEventListener('change', render);
       $('searchFilter').addEventListener('input', render);
 
+      // Универсальное копирование текста в буфер обмена
+      async function copyTextToClipboard(text) {
+        if (navigator.clipboard && window.isSecureContext) {
+          try {
+            await navigator.clipboard.writeText(text);
+            return true;
+          } catch (_) {}
+        }
+        const area = document.createElement('textarea');
+        area.value = text;
+        area.style.position = 'fixed';
+        area.style.opacity = '0';
+        area.style.left = '-9999px';
+        document.body.appendChild(area);
+        area.focus();
+        area.select();
+        let ok = false;
+        try {
+          ok = document.execCommand('copy');
+        } catch (_) {}
+        area.remove();
+        return ok;
+      }
+
+      function exportRows(useAllEntries = false) {
+        const header = ['Date', 'Amount', 'Currency', 'Category', 'Comment'];
+        const source = useAllEntries
+          ? [...entries].sort((a, b) => a.date.localeCompare(b.date) || a.createdAt - b.createdAt)
+          : filteredEntries();
+        const rows = source.map((x) => [x.date, x.amount, x.currency, x.category, x.comment]);
+        return { header, rows };
+      }
+
+      // Обычное копирование для Sheets (с шапкой)
+      $('copyBtn').addEventListener('click', async () => {
+        const { header, rows } = exportRows(false);
+        if (!rows.length) {
+          showStatus('Нет записей для копирования.', 'error');
+          return;
+        }
+        const text = [header, ...rows]
+          .map((row) => row.map((field) => String(field ?? '').replace(/[\t\r\n]+/g, ' ')).join('\t'))
+          .join('\n');
+
+        const ok = await copyTextToClipboard(text);
+        if (ok) {
+          showStatus(`Скопировано записей: ${rows.length}. Вставь в Sheets (Ctrl+V).`);
+        } else {
+          showStatus('Не удалось скопировать. Используй Copy to CSV.', 'error');
+        }
+      });
+
+      // Экспорт в CSV
       function csvCell(value) {
         const text = String(value ?? '');
         return `"${text.replace(/"/g, '""')}"`;
       }
-      function exportRows() {
-        const header = ['Date', 'Amount', 'Currency', 'Category', 'Comment'];
-        const rows = filteredEntries().map((x) => [x.date, x.amount, x.currency, x.category, x.comment]);
-        return { header, rows };
-      }
-
-      $('copyBtn').addEventListener('click', async () => {
-        const { header, rows } = exportRows();
-        const text = [header, ...rows].map((row) => row.map((field) => String(field ?? '').replace(/[\t\r\n]+/g, ' ')).join('\t')).join('\n');
-        try {
-          if (navigator.clipboard && window.isSecureContext) {
-            await navigator.clipboard.writeText(text);
-          } else {
-            const area = document.createElement('textarea');
-            area.value = text;
-            area.style.position = 'fixed'; area.style.opacity = '0'; area.style.left = '-9999px';
-            document.body.appendChild(area); area.select();
-            const ok = document.execCommand('copy'); area.remove();
-            if (!ok) throw new Error('copy failed');
-          }
-          showMessage(`Скопировано ${rows.length} записей. Вставь их в Google Sheets (Ctrl+V / ⌘V).`);
-        } catch (error) {
-          showMessage('Браузер не разрешил копирование. Используй «Экспорт CSV».', true);
-        }
-      });
 
       $('csvBtn').addEventListener('click', () => {
-        const { header, rows } = exportRows();
+        const { header, rows } = exportRows(false);
+        if (!rows.length) {
+          showStatus('Нет записей для экспорта в CSV.', 'error');
+          return;
+        }
         const csv = '\uFEFF' + [header, ...rows].map((row) => row.map(csvCell).join(',')).join('\r\n');
         const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
         link.download = `money-tracker-${todayLocal()}.csv`;
-        document.body.appendChild(link); link.click(); link.remove();
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
         URL.revokeObjectURL(url);
-        showMessage(`CSV экспортирован: ${rows.length} записей.`);
+        showStatus(`CSV скачан (${rows.length} зап.)`);
       });
 
+      // 4) Кнопка "Export to PORSCHE"
+      $('porscheBtn').addEventListener('click', async () => {
+        if (!entries.length) {
+          // Даже если записей нет, откроем таблицу, но предупредим
+          window.open(PORSCHE_SHEET_URL, '_blank', 'noopener');
+          showStatus('Открыта таблица PORSCHE (новых записей для копирования не было).');
+          return;
+        }
+
+        // Формируем строки БЕЗ заголовка в хронологическом порядке, чтобы сразу вставлять в пустые строки ниже
+        const { rows } = exportRows(true);
+        const tsvBodyOnly = rows
+          .map((row) => row.map((field) => String(field ?? '').replace(/[\t\r\n]+/g, ' ')).join('\t'))
+          .join('\n');
+
+        // 1. Копируем в буфер обмена
+        const copied = await copyTextToClipboard(tsvBodyOnly);
+
+        // 2. Если настроен опциональный Google Apps Script Webhook — отправляем данные напрямую в конец таблицы
+        const webhookUrl = ($('webhookUrl').value || '').trim();
+        if (webhookUrl) {
+          try {
+            fetch(webhookUrl, {
+              method: 'POST',
+              mode: 'no-cors',
+              headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+              body: JSON.stringify({ sheetGid: 583901007, rows })
+            });
+          } catch (_) {}
+        }
+
+        // 3. Открываем Google Таблицу PORSCHE в новой вкладке
+        window.open(PORSCHE_SHEET_URL, '_blank', 'noopener');
+
+        // 4. Проверяем тумблер очистки данных после экспорта
+        const shouldClear = $('clearOnPorscheToggle').checked;
+        const exportedCount = rows.length;
+
+        if (shouldClear) {
+          const backupCopy = [...entries];
+          try {
+            localStorage.setItem(BACKUP_KEY, JSON.stringify(backupCopy));
+          } catch (_) {}
+
+          entries = [];
+          persist();
+          render();
+
+          showStatus(
+            copied
+              ? `Скопировано ${exportedCount} шт. в PORSCHE! Нажми Ctrl+V в пустой строке таблицы. Данные здесь очищены.`
+              : `Открыта таблица PORSCHE. Данные очищены (${exportedCount} шт.).`,
+            'success',
+            () => {
+              entries = backupCopy;
+              persist();
+              render();
+            }
+          );
+        } else {
+          showStatus(
+            copied
+              ? `Скопировано ${exportedCount} шт.! Нажми Ctrl+V в пустой строке таблицы PORSCHE.`
+              : `Таблица PORSCHE открыта.`
+          );
+        }
+      });
+
+      // Первый рендер
       render();
     })();
   </script>
